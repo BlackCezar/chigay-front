@@ -41,3 +41,9 @@
     transform: rotate(360deg);
   }
 }
+
+.upload__image-wrapper {
+  .image-item {
+    overflow: hidden;
+  }
+}

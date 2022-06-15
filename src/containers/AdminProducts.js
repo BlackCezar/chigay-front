@@ -8,14 +8,15 @@ import {
   AccordionPanel,
   AccordionIcon,
 } from "@chakra-ui/react";
+import AdminProductCreateTab from "../components/admin/AdminProductCreateTab";
 
 export default function AdminProducts() {
   return (
     <div>
-      <Heading>Продукты</Heading>
+      <Heading>Товары</Heading>
 
       <Box m={3}>
-        <Tabs>
+        <Tabs defaultIndex={2}>
           <TabList>
             <Tab>Список</Tab>
             <Tab>Добавить</Tab>
@@ -60,7 +61,7 @@ export default function AdminProducts() {
               </Accordion>
             </TabPanel>
             <TabPanel>
-              <p>two!</p>
+              <AdminProductCreateTab />
             </TabPanel>
           </TabPanels>
         </Tabs>
