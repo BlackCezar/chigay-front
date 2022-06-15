@@ -10,54 +10,64 @@ import {
   IconButton,
   Input,
   SimpleGrid,
+  Spinner,
   Text,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useEffect } from "react";
 // import { useGetUsersQuery } from "../store/services/UserService";
 import Sidebar from "../components/Sidebar";
 import Product from "../components/Product";
+import {useParams } from 'react-router-dom';
+import {  useLazyGetProductsQuery } from "../store/services/ProductsService";
+import { useGetCategoyQuery, useLazyGetCategoriesQuery } from "../store/services/CategoriesService";
 
 export default function UsersPage() {
-  //   const { data, isLoading } = useGetUsersQuery();
-  //   const users = data && data.array ? data.array : [];
-  //   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {categoryId} = useParams()
+  const [getProducts, {data: products, isLoading}] = useLazyGetProductsQuery()
+  const [getCategories, {data: subcategories}] = useLazyGetCategoriesQuery()
+
+  const {data: category} = useGetCategoyQuery(categoryId)
+  useEffect(() => {
+    if (categoryId && category && category.parent) {
+      console.log(category)
+      getProducts({categories: categoryId})
+      getCategories({parent: category.parent._id})
+    } else if (categoryId && category && !category.parent) getProducts({categories: categoryId})
+  }, [categoryId, category, getCategories])
 
   return (
     <Flex>
-      <Sidebar />
+      {categoryId && category && !category.parent ? <div></div> : 
+      <Sidebar items={subcategories} />}
       <Box p="4" pt={0} ml={2}>
         <Breadcrumb>
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">Home</BreadcrumbLink>
+            <BreadcrumbLink href="/">Главная</BreadcrumbLink>
           </BreadcrumbItem>
-
+          {category && category.parent && 
           <BreadcrumbItem>
-            <BreadcrumbLink href="#">Docs</BreadcrumbLink>
-          </BreadcrumbItem>
-
+            <BreadcrumbLink href={"/categories/" + category.parent._id}>{category.parent.name}</BreadcrumbLink>
+          </BreadcrumbItem>}
+          {category && 
           <BreadcrumbItem isCurrentPage>
-            <BreadcrumbLink href="#">Breadcrumb</BreadcrumbLink>
-          </BreadcrumbItem>
+            <BreadcrumbLink href={"/categories/" + category._id}>{category?.name}</BreadcrumbLink>
+          </BreadcrumbItem>}
         </Breadcrumb>
-        <Heading>Образование</Heading>
+        <Heading>{category?.name}</Heading>
+        {isLoading || !products ? <Spinner /> : <div>
         <Text>
-          Найдено <b>39723</b>товара
+          Найдено <b>{products.length}</b> товар
         </Text>
         <Box bg="gray.100" mt={3} p={3} mb={3} borderRadius="md">
           <Flex alignItems="center">
-            <Input type="search" bg="white" />
+            <Input type="search" onChange={ev => getProducts({title: ev.target.value, categories: categoryId})} bg="white" />
             <IconButton ml={2} icon={<SearchIcon />} />
           </Flex>
         </Box>
         <SimpleGrid columns={4} spacing={10}>
-          <Product />
-          <Product />
-          <Product />
-          <Product />
-          <Product />
-          <Product />
-          <Product />
-        </SimpleGrid>
+          {products && products.length ? products.map(p => (<Product product={p} key={p._id} />)) : <Text>Нет товаров</Text>}
+        </SimpleGrid></div>}
+        
       </Box>
     </Flex>
   );

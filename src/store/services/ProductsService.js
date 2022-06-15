@@ -42,6 +42,7 @@ export const {
   useCreateProductMutation,
   useGetProductsQuery,
   useGetProductQuery,
+  useLazyGetProductsQuery,
   useDeleteProductQuery,
   useLazyDeleteProductQuery,
   useUpdateProductMutation,

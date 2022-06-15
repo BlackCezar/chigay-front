@@ -1,21 +1,23 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
-import { Navigate } from 'react-router-dom'
-import DashboardStudent from '../components/dashboard/DashboardStudent'
-import DashboardTeacher from '../components/dashboard/DashboardTeacher'
-import DashboardParent from '../components/dashboard/DashboardParent'
+// import { useDisclosure } from "@chakra-ui/react";
+import {
+  Box,
+  Center,
+  Container,
+  Heading,
 
-export default function DashboardPage() {
-    const user = useSelector((state) => state.user.object)
+} from "@chakra-ui/react";
+import React from "react";
 
-    if (user.role === 'Student') {
-        return <DashboardStudent user={user} />
-    }
-    if (user.role === 'Teacher') {
-        return <DashboardTeacher user={user} />
-    }
-    if (user.role === 'Parent') {
-        return <DashboardParent user={user} />
-    }
-    return <Navigate to="404" />
+export default function UsersPage() {
+
+  return (
+    <Container>
+    <Center>
+      <Box p="4" pt={0} ml={2}>
+        <Heading>Сайт читай город</Heading>
+      </Box>
+    </Center>
+    </Container>
+
+  );
 }

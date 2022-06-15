@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import usersReducer from "../reducers/user";
+import cartReducer from "../reducers/cart";
 import { userAPI } from "./services/UserService";
 import { productionsAPI } from "./services/ProductionService";
 import { productsAPI } from "./services/ProductsService";
@@ -10,6 +11,7 @@ export const createStore = (options) =>
   configureStore({
     reducer: {
       user: usersReducer,
+      cart: cartReducer,
       [userAPI.reducerPath]: userAPI.reducer,
       [productionsAPI.reducerPath]: productionsAPI.reducer,
       [productsAPI.reducerPath]: productsAPI.reducer,

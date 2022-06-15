@@ -15,12 +15,15 @@ import {
   Stack,
   Text,
   Textarea,
+  useToast,
 } from "@chakra-ui/react";
 import ImageUploading from "react-images-uploading";
 import { useGetProductinosQuery } from "../../store/services/ProductionService";
 import { useGetCategoriesQuery } from "../../store/services/CategoriesService";
+import { useCreateProductMutation } from "../../store/services/ProductsService";
 
 export default function AdminProductCreateTab() {
+  const [create, {error}] = useCreateProductMutation()
   const [images, setImages] = React.useState([]);
   const [productForm, setProductForm] = React.useState({
     title: "",
@@ -46,6 +49,48 @@ export default function AdminProductCreateTab() {
   };
   const { data: productions } = useGetProductinosQuery();
   const { data: categories } = useGetCategoriesQuery();
+  const toast = useToast();
+
+  const createProduct = async () => {
+    const fd = new FormData();
+    fd.append('json', JSON.stringify(productForm))
+    // for (let i = 0; i < images.length; i++) {
+    //   fd.append(`images[${i}]`, images[i].file)  
+    // }
+    for (let image of images) {
+      fd.append('images', image.file)
+    }
+    try {
+      let resp = await create(fd)
+      console.log(resp.data)
+      if (resp.data.code === 0) {
+        toast({
+          title: "Товар создан",
+          status: "success",
+          duration: 2000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "Ошибка",
+          description: resp.data.message || '',
+          status: "error",
+          duration: 2000,
+          isClosable: true,
+        });
+      }
+
+    } catch (err) {
+      console.log(err)
+      toast({
+        title: "Ошибка",
+        description: error || '',
+        status: "error",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+  }
 
   return (
     <Box>
@@ -56,7 +101,7 @@ export default function AdminProductCreateTab() {
             <Input
               id="title"
               value={productForm.title}
-              onChange={(ev) => setProductForm({ title: ev.target.value })}
+              onChange={(ev) => setProductForm({ ...productForm, title: ev.target.value })}
               placeholder="Введите название"
               mb={3}
             />
@@ -66,7 +111,7 @@ export default function AdminProductCreateTab() {
             <Input
               id="author"
               value={productForm.author}
-              onChange={(ev) => setProductForm({ author: ev.target.value })}
+              onChange={(ev) => setProductForm({ ...productForm, author: ev.target.value })}
               placeholder="Стрельцов И.А."
               mb={3}
             />
@@ -76,17 +121,27 @@ export default function AdminProductCreateTab() {
             <Input
               id="article"
               value={productForm.artikle}
-              onChange={(ev) => setProductForm({ artikle: ev.target.value })}
+              onChange={(ev) => setProductForm({ ...productForm, artikle: ev.target.value })}
               placeholder=""
               mb={3}
             />
           </FormControl>
           <FormControl isRequired>
+              <FormLabel htmlFor="format">Формат:</FormLabel>
+              <Input
+                id="format"
+                value={productForm.format}
+                onChange={(ev) => setProductForm({ ...productForm, format: ev.target.value })}
+                placeholder=""
+                mb={3}
+              />
+            </FormControl>
+          <FormControl isRequired>
             <FormLabel htmlFor="year">Год выпуска:</FormLabel>
             <NumberInput
               id="year"
               value={productForm.year}
-              onChange={(ev) => setProductForm({ year: ev.target.value })}
+              onChange={(ev) => setProductForm({ ...productForm, year: ev })}
               min={1900}
               max={2023}
             >
@@ -102,7 +157,7 @@ export default function AdminProductCreateTab() {
             <NumberInput
               id="pages"
               value={productForm.pagesCount}
-              onChange={(ev) => setProductForm({ pagesCount: ev.target.value })}
+              onChange={(ev) => setProductForm({ ...productForm, pagesCount: ev })}
               min={0}
               max={10000}
             >
@@ -119,7 +174,7 @@ export default function AdminProductCreateTab() {
               id="type"
               value={productForm.typeWrapper}
               onChange={(ev) =>
-                setProductForm({ typeWrapper: ev.target.value })
+                setProductForm({ ...productForm, typeWrapper: ev.target.value })
               }
             >
               <option value="Мягкая бумажная">Мягкая бумажная</option>
@@ -131,7 +186,7 @@ export default function AdminProductCreateTab() {
             <Textarea
               id="desc"
               value={productForm.descripton}
-              onChange={(ev) => setProductForm({ descripton: ev.target.value })}
+              onChange={(ev) => setProductForm({ ...productForm, descripton: ev.target.value })}
               placeholder="Введите название"
               mb={3}
             />
@@ -141,7 +196,7 @@ export default function AdminProductCreateTab() {
             <NumberInput
               id="weight"
               value={productForm.weigh}
-              onChange={(ev) => setProductForm({ weigh: ev.target.value })}
+              onChange={(ev) => setProductForm({ ...productForm, weigh: ev })}
               min={0}
               max={10000}
             >
@@ -158,7 +213,7 @@ export default function AdminProductCreateTab() {
               id="age"
               value={productForm.ageRestriction}
               onChange={(ev) =>
-                setProductForm({ ageRestriction: ev.target.value })
+                setProductForm({ ...productForm, ageRestriction: ev.target.value })
               }
               min={0}
               max={10000}
@@ -175,7 +230,7 @@ export default function AdminProductCreateTab() {
             <NumberInput
               id="price"
               value={productForm.price}
-              onChange={(ev) => setProductForm({ price: ev.target.value })}
+              onChange={(ev) => setProductForm({ ...productForm, price: ev })}
               min={0}
               max={10000}
             >
@@ -191,7 +246,7 @@ export default function AdminProductCreateTab() {
             <NumberInput
               id="qty"
               value={productForm.quantity}
-              onChange={(ev) => setProductForm({ quantity: ev.target.value })}
+              onChange={(ev) => setProductForm({ ...productForm, quantity: ev })}
               min={0}
               max={10000}
             >
@@ -206,9 +261,8 @@ export default function AdminProductCreateTab() {
             <FormLabel htmlFor="categories">Категории:</FormLabel>
             <Select
               id="categories"
-              multiple
               value={productForm.categories}
-              onChange={(ev) => setProductForm({ categories: ev.target.value })}
+              onChange={(ev) => setProductForm({ ...productForm, categories: ev })}
             >
               {categories &&
                 categories.length &&
@@ -224,7 +278,7 @@ export default function AdminProductCreateTab() {
             <Select
               id="production"
               value={productForm.production}
-              onChange={(ev) => setProductForm({ production: ev.target.value })}
+              onChange={(ev) => setProductForm({ ...productForm, production: ev.target.value })}
             >
               {productions &&
                 productions.length &&
@@ -295,7 +349,7 @@ export default function AdminProductCreateTab() {
         </Box>
       </Flex>
       <Flex>
-        <Button size="lg" mt={3} colorScheme="telegram" ml="auto">
+        <Button size="lg" mt={3} colorScheme="telegram" ml="auto" onClick={createProduct}>
           Добавить
         </Button>
       </Flex>

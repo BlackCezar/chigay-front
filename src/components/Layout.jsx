@@ -24,6 +24,7 @@ import {
   MenuItem,
   MenuList,
   Modal,
+  Wrap,
   ModalBody,
   ModalCloseButton,
   ModalContent,
@@ -44,8 +45,12 @@ import {
 import { saveUser } from "../reducers/user";
 import { ChevronDownIcon, HamburgerIcon } from "@chakra-ui/icons";
 import { useToast } from "@chakra-ui/react";
+import { useGetCategoriesQuery } from "../store/services/CategoriesService";
+import { useGetProductsQuery } from "../store/services/ProductsService";
+import {ReactComponent as CartIcon} from '../assets/images/cart.svg'
 
 export default function Layout({ children }) {
+  const { data: categories } = useGetCategoriesQuery();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.object);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -201,7 +206,7 @@ export default function Layout({ children }) {
         }
       }
     }
-  }, [authData.data, checkUserData.data, dispatch, toast, signUpData.data]);
+  }, [authData.data, checkUserData.data, dispatch, toast, signUpData.data, authData.isSuccess, closeSignUp, onClose, signUpData.error, signUpData.isError, signUpData.isLoading, signUpData.isSuccess, user]);
 
   return (
     <div className="page-layout">
@@ -221,66 +226,23 @@ export default function Layout({ children }) {
               </Flex>
               {user && user.role === "Admin" ? (
                 <></>
-              ) : (
-                <Menu>
+              ) : categories && categories.filter(c => !c.parent).map(c => (
+                <Menu key={c._id}>
+                  
                   <MenuButton
                     className="menu-link"
                     as={Button}
                     rightIcon={<ChevronDownIcon />}
                   >
-                    Жанры
+                    {c.name}
                   </MenuButton>
                   <MenuList>
-                    <MenuItem>Download</MenuItem>
-                    <MenuItem>Create a Copy</MenuItem>
-                    <MenuItem>Mark as Draft</MenuItem>
-                    <MenuItem>Delete</MenuItem>
-                    <MenuItem>Attend a Workshop</MenuItem>
+                    {categories.filter(subcat => subcat.parent && String(subcat.parent._id) === String(c._id)).map(subcat => (<LinkRouter key={subcat._id} to={`/categories/${subcat._id}`}><MenuItem>{subcat.name}</MenuItem></LinkRouter>))}
                   </MenuList>
                 </Menu>
-              )}
+              )) }
 
               {user && user.role === "Admin" ? (
-                <></>
-              ) : (
-                <Menu>
-                  <MenuButton
-                    className="menu-link"
-                    as={Button}
-                    rightIcon={<ChevronDownIcon />}
-                  >
-                    Подборки
-                  </MenuButton>
-                  <MenuList>
-                    <MenuItem>Download</MenuItem>
-                    <MenuItem>Create a Copy</MenuItem>
-                    <MenuItem>Mark as Draft</MenuItem>
-                    <MenuItem>Delete</MenuItem>
-                    <MenuItem>Attend a Workshop</MenuItem>
-                  </MenuList>
-                </Menu>
-              )}
-              {user && user.role === "Admin" ? (
-                <></>
-              ) : (
-                <Menu>
-                  <MenuButton
-                    as={Button}
-                    className="menu-link"
-                    rightIcon={<ChevronDownIcon />}
-                  >
-                    Издательства
-                  </MenuButton>
-                  <MenuList>
-                    <MenuItem>Download</MenuItem>
-                    <MenuItem>Create a Copy</MenuItem>
-                    <MenuItem>Mark as Draft</MenuItem>
-                    <MenuItem>Delete</MenuItem>
-                    <MenuItem>Attend a Workshop</MenuItem>
-                  </MenuList>
-                </Menu>
-              )}
-              {user && user.role === "Admin" && (
                 <Menu>
                   <MenuButton
                     as={Button}
@@ -296,9 +258,12 @@ export default function Layout({ children }) {
                     <LinkRouter to="/admin/categories">
                       <MenuItem>Категории</MenuItem>
                     </LinkRouter>
+                    <LinkRouter to="/admin/productions">
+                      <MenuItem>Издатели</MenuItem>
+                    </LinkRouter>
                   </MenuList>
                 </Menu>
-              )}
+              ) : (<Wrap ml='auto'><LinkRouter to='/cart'> <IconButton mr={2}  p={2} icon={<CartIcon />} /></LinkRouter></Wrap>)}
               {user && user._id ? (
                 <Menu>
                   <MenuButton
@@ -322,7 +287,6 @@ export default function Layout({ children }) {
                   icon={<HamburgerIcon />}
                   ref={btnRef}
                   onClick={onOpen}
-                  ml="auto"
                 />
               )}
             </Flex>

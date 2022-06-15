@@ -5,8 +5,8 @@ import { ChakraProvider, Heading } from "@chakra-ui/react";
 import { Provider } from "react-redux";
 import App from "./App";
 import { store } from "./store";
-import DashboardPage from "./containers/DashboardPage";
 import ProductsPage from "./containers/ProductsPage";
+import DashboardPage from './containers/DashboardPage'
 import Logout from "./containers/Logout";
 import Cart from "./containers/Cart";
 import theme from "./theme";
@@ -14,6 +14,8 @@ import Layout from "./components/Layout";
 import AdminCategories from "./containers/AdminCategories";
 import AdminProducts from "./containers/AdminProducts";
 import AdminOrders from "./containers/AdminOrders";
+import AdminProductions from "./containers/AdminProductions";
+import ProductDetailPage from './components/ProductDetailPage.jsx'
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -26,18 +28,11 @@ root.render(
               path="/"
               element={
                 <Layout>
-                  <ProductsPage />
-                </Layout>
-              }
-            />
-            <Route
-              path="dashboard"
-              element={
-                <Layout>
                   <DashboardPage />
                 </Layout>
               }
             />
+
             <Route
               path="login"
               element={
@@ -51,6 +46,22 @@ root.render(
               element={
                 <Layout>
                   <Cart />
+                </Layout>
+              }
+            />
+            <Route
+              path="categories/:categoryId"
+              element={
+                <Layout>
+                  <ProductsPage />
+                </Layout>
+              }
+            />
+            <Route
+              path="products/:productId"
+              element={
+                <Layout>
+                  <ProductDetailPage />
                 </Layout>
               }
             />
@@ -75,6 +86,14 @@ root.render(
               element={
                 <Layout>
                   <AdminCategories />
+                </Layout>
+              }
+            />
+            <Route
+              path="admin/productions"
+              element={
+                <Layout>
+                  <AdminProductions />
                 </Layout>
               }
             />

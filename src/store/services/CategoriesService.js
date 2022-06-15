@@ -43,6 +43,8 @@ export const {
   useGetCategoriesQuery,
   useGetCategoyQuery,
   useDeleteCategoyQuery,
+  useLazyGetCategoriesQuery,
+  useLazyGetCategoyQuery,
   useLazyDeleteCategoyQuery,
   useUpdateCategoyMutation,
 } = categoriesAPI;
