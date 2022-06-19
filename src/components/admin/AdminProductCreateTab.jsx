@@ -53,10 +53,8 @@ export default function AdminProductCreateTab() {
 
   const createProduct = async () => {
     const fd = new FormData();
+    console.log(productForm)
     fd.append('json', JSON.stringify(productForm))
-    // for (let i = 0; i < images.length; i++) {
-    //   fd.append(`images[${i}]`, images[i].file)  
-    // }
     for (let image of images) {
       fd.append('images', image.file)
     }
@@ -172,6 +170,7 @@ export default function AdminProductCreateTab() {
             <FormLabel htmlFor="type">Тим обложки:</FormLabel>
             <Select
               id="type"
+              placeholder='Выберите из списка'
               value={productForm.typeWrapper}
               onChange={(ev) =>
                 setProductForm({ ...productForm, typeWrapper: ev.target.value })
@@ -262,7 +261,8 @@ export default function AdminProductCreateTab() {
             <Select
               id="categories"
               value={productForm.categories}
-              onChange={(ev) => setProductForm({ ...productForm, categories: ev })}
+              placeholder='Выберите из списка'
+              onChange={(ev) => setProductForm({ ...productForm, categories: ev.target.value })}
             >
               {categories &&
                 categories.length &&
@@ -277,6 +277,7 @@ export default function AdminProductCreateTab() {
             <FormLabel htmlFor="production">Издательство:</FormLabel>
             <Select
               id="production"
+              placeholder='Выберите из списка'
               value={productForm.production}
               onChange={(ev) => setProductForm({ ...productForm, production: ev.target.value })}
             >

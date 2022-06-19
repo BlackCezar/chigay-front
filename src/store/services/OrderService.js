@@ -35,6 +35,14 @@ export const ordersAPI = createApi({
       query: (id) => ({ url: `/${id}`, method: "DELETE" }),
       invalidatesTags: ["Orders"],
     }),
+    sendMessage:  build.mutation({
+      query: (data) => ({
+        url: "/send",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Orders"],
+    }),
   }),
 });
 
@@ -44,4 +52,5 @@ export const {
   useGetOrderQuery,
   useLazyDeleteOrderQuery,
   useUpdateOrderMutation,
+  useSendMessageMutation
 } = ordersAPI;

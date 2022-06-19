@@ -3,13 +3,17 @@ import { Box, Button, Divider, FormControl, FormLabel, Heading, IconButton, Inpu
 import React, { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { removeProduct, setAddress, setCount, setPhone } from '../reducers/cart'
+import { removeProduct, setAddress, setCount, setPhone, clearCart } from '../reducers/cart'
+import { useCreateOrderMutation, useSendMessageMutation } from '../store/services/OrderService'
 
 export default function CartPage() {
     const products = useSelector(state => state.cart.products)
+    const user = useSelector(state => state.user.object)
     const phone = useSelector(state => state.cart.phone)
     const address = useSelector(state => state.cart.address)
     const [rerender, setRerender] = React.useState(false)
+    const [create, {isLoading, data: gotObj}] = useCreateOrderMutation()
+    const [send] = useSendMessageMutation()
     
     const navigation = useNavigate()
     const dispatch = useDispatch()
@@ -20,6 +24,20 @@ export default function CartPage() {
         }
         return sum
     }, [products])
+
+    const createOrder = async () => {
+        const d = await create({
+            phone,
+            address,
+            status: 'В ожидании',
+            amount: parseInt(total),
+            user: user ? user._id : null,
+            products
+        })
+        await send(gotObj)
+        dispatch(clearCart())
+        navigation('/')
+    }
 
     return <div><Box>
         <Heading>
@@ -67,7 +85,7 @@ export default function CartPage() {
         <Box float='right' p={3} boxShadow='base' mt={3} borderWidth='1px' borderRadius='base'>
             <Text>Итого: <b>{total.toLocaleString('ru-RU', { style: 'currency', currency: 'RUB' })}</b></Text>
             <Divider mt={3} mb={3} />
-            <Button ml='auto' size='lg' colorScheme='pink'>Оформить</Button>
+            <Button disabled={isLoading} ml='auto' size='lg' onClick={createOrder} colorScheme='pink'>Оформить</Button>
         </Box>
     </Box></div>
 }
